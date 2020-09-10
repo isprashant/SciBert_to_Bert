@@ -1,4 +1,5 @@
-# Keyphrase Extraction using SciBERT (Semeval 2017, Task 10)
+##### *This is a copy of this original work by [Pranav A](https://github.com/pranav-ust/BERT-keyphrase-extraction)
+# Keyphrase Extraction using SciBERT 
 
 Deep Keyphrase extraction using SciBERT.
 

@@ -12,7 +12,7 @@ from pytorch_pretrained_bert import BertTokenizer
 import utils
 
 class DataLoader(object):
-    def __init__(self, data_dir, bert_model_dir, params, token_pad_idx=0):
+    def __init__(self, data_dir, params, token_pad_idx=0):
         self.data_dir = data_dir
         self.batch_size = params.batch_size
         self.max_len = params.max_len
@@ -27,7 +27,7 @@ class DataLoader(object):
         params.idx2tag = self.idx2tag
         self.tag_pad_idx = self.tag2idx['O']
 
-        self.tokenizer = BertTokenizer.from_pretrained(bert_model_dir, do_lower_case=True)
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
     def load_tags(self):
         tags = []
@@ -47,7 +47,7 @@ class DataLoader(object):
         with open(sentences_file, 'r') as file:
             for line in file:
                 # replace each token by its index
-                tokens = line.split()
+                tokens = self.tokenizer.tokenize(line)
                 sentences.append(self.tokenizer.convert_tokens_to_ids(tokens))
         
         with open(tags_file, 'r') as file:
@@ -56,10 +56,18 @@ class DataLoader(object):
                 tag_seq = [self.tag2idx.get(tag) for tag in line.strip().split(' ')]
                 tags.append(tag_seq)
 
+        # print(len(sentences), len(tags))
+
         # checks to ensure there is a tag for each token
         assert len(sentences) == len(tags)
         for i in range(len(sentences)):
-#             print(sentences[i], tags[i])
+          # appending 0 in tags if length of sentences tokens are not equal to length tags
+            if len(sentences[i]) != len(tags[i]):
+                  t=[]
+                  t=[0]*abs(len(sentences[i])-len(tags[i]))
+                  tags[i].extend(t)
+            # print(sentences[i], tags[i], '\n')
+            # print(len(sentences[i]), len(tags[i]))
             assert len(tags[i]) == len(sentences[i])
 
         # storing sentences and tags in dict d

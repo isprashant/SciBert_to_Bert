@@ -4,7 +4,7 @@ Deep Keyphrase extraction using BERT.
 
 ## Usage
 
-1. Clone this repository and install `pytorch-pretrained-BERT`
+1. Clone this repository and install `pytorch-pretrained-BERT`.\n
 ``2. From `scibert` repo, untar the weights (rename their weight dump file to `pytorch_model.bin`) and vocab file into a new folder `model`.``
 3. Change the parameters accordingly in `experiments/base_model/params.json`. We recommend keeping batch size of 4 and sequence length of 512, with 6 epochs, if GPU's VRAM is around 11 GB.
 4. For training, run the command `python train.py --data_dir data/task1/ --model_dir experiments/base_model`

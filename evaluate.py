@@ -1,5 +1,3 @@
-"""Evaluate the model"""
-
 import argparse
 import random
 import logging
@@ -99,7 +97,7 @@ if __name__ == '__main__':
     logging.info("Loading the dataset...")
 
     # Initialize the DataLoader
-    data_loader = DataLoader(args.data_dir, args.bert_model_dir, params, token_pad_idx=0)
+    data_loader = DataLoader(args.data_dir, params, token_pad_idx=0)
 
     # Load data
     test_data = data_loader.load_data('test')
@@ -112,10 +110,10 @@ if __name__ == '__main__':
     logging.info("- done.")
 
     # Define the model
-    config_path = os.path.join(args.bert_model_dir, 'bert_config.json')
-    config = BertConfig.from_json_file(config_path)
-    model = BertForTokenClassification(config, num_labels=len(params.tag2idx))
-
+    #config_path = os.path.join(args.bert_model_dir, 'bert_config.json')
+    #config = BertConfig.from_json_file(config_path)
+    model = BertForTokenClassification("bert-base-uncased", num_labels=len(params.tag2idx))
+    model = model.cuda()
     model.to(params.device)
     # Reload weights from the saved file
     utils.load_checkpoint(os.path.join(args.model_dir, args.restore_file + '.pth.tar'), model)
@@ -126,4 +124,3 @@ if __name__ == '__main__':
 
     logging.info("Starting evaluation...")
     test_metrics = evaluate(model, test_data_iterator, params, mark='Test', verbose=True)
-

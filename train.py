@@ -1,4 +1,5 @@
 """Train and evaluate the model"""
+# this file is used to train and evaluate a model
 
 import argparse
 import random
@@ -17,7 +18,7 @@ from data_loader import DataLoader
 from evaluate import evaluate
 import utils
 
-
+print("Parsing Arguments")
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='data/task1', help="Directory containing the dataset")
 parser.add_argument('--bert_model_dir', default='bert-base-uncased-pytorch', help="Directory containing the BERT model in PyTorch")

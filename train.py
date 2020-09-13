@@ -1,4 +1,5 @@
 """Train and evaluate the model"""
+# this file is used to train and evaluate a model
 
 import argparse
 import random
@@ -17,7 +18,7 @@ from data_loader import DataLoader
 from evaluate import evaluate
 import utils
 
-
+print("Parsing Arguments")
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='data/task1', help="Directory containing the dataset")
 parser.add_argument('--bert_model_dir', default='bert-base-uncased-pytorch', help="Directory containing the BERT model in PyTorch")
@@ -31,7 +32,6 @@ parser.add_argument('--loss_scale', type=float, default=0,
                         help="Loss scaling to improve fp16 numeric stability. Only used when fp16 set to True.\n"
                              "0 (default value): dynamic loss scaling.\n"
                              "Positive power of 2: static loss scaling value.\n")
-
 
 def train(model, data_iterator, optimizer, scheduler, params):
     """Train the model on `steps` batches"""
@@ -71,8 +71,8 @@ def train(model, data_iterator, optimizer, scheduler, params):
         # update the average loss
         loss_avg.update(loss.item())
         t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
-    
 
+        
 def train_and_evaluate(model, train_data, val_data, optimizer, scheduler, params, model_dir, restore_file=None):
     """Train the model and evaluate every epoch."""
     # reload weights from restore_file if specified
@@ -132,7 +132,7 @@ def train_and_evaluate(model, train_data, val_data, optimizer, scheduler, params
         if (patience_counter >= params.patience_num and epoch > params.min_epoch_num) or epoch == params.epoch_num:
             logging.info("Best val f1: {:05.2f}".format(best_val_f1))
             break
-        
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -162,25 +162,28 @@ if __name__ == '__main__':
     logging.info("Loading the datasets...")
     
     # Initialize the DataLoader
-    data_loader = DataLoader(args.data_dir, args.bert_model_dir, params, token_pad_idx=0)
+    data_loader = DataLoader(args.data_dir, params, token_pad_idx=0)
+    #data_loader = DataLoader(args.data_dir, args.bert_model_dir, params, token_pad_idx=0)
     
     # Load training data and test data
     train_data = data_loader.load_data('train')
     val_data = data_loader.load_data('val')
+
+
 
     # Specify the training and validation dataset sizes
     params.train_size = train_data['size']
     params.val_size = val_data['size']
 
     # Prepare model
-    model = BertForTokenClassification.from_pretrained(args.bert_model_dir, num_labels=len(params.tag2idx))
+    model = BertForTokenClassification.from_pretrained("bert-base-uncased", num_labels=len(params.tag2idx))
     model.to(params.device)
     if args.fp16:
         model.half()
 
     if params.n_gpu > 1 and args.multi_gpu:
         model = torch.nn.DataParallel(model)
-
+    
     # Prepare optimizer
     if params.full_finetuning:
         param_optimizer = list(model.named_parameters())
@@ -217,4 +220,3 @@ if __name__ == '__main__':
     # Train and evaluate the model
     logging.info("Starting training for {} epoch(s)".format(params.epoch_num))
     train_and_evaluate(model, train_data, val_data, optimizer, scheduler, params, args.model_dir, args.restore_file)
-
